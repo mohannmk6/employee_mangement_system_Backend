@@ -1,3 +1,4 @@
+
 package com.example.ems.security;
 
 import java.io.IOException;
@@ -27,26 +28,47 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/api/auth/") || path.equals("/error");
+
+        return path.equals("/")
+                || path.startsWith("/api/auth/")
+                || path.equals("/error")
+                || request.getMethod().equalsIgnoreCase("OPTIONS");
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain chain)
+            throws ServletException, IOException {
+
         String header = request.getHeader("Authorization");
+
         if (header != null && header.startsWith("Bearer ")) {
             try {
                 Claims claims = jwt.parse(header.substring(7));
+
                 String username = claims.getSubject();
                 String role = claims.get("role", String.class);
-                var auth = new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority(role)));
+
+                var auth = new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        List.of(new SimpleGrantedAuthority(role))
+                );
+
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
             } catch (Exception ex) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
-                response.getWriter().write("{\"message\":\"Invalid or expired token\"}");
+                response.getWriter().write(
+                        "{\"message\":\"Invalid or expired token\"}"
+                );
                 return;
             }
         }
+
         chain.doFilter(request, response);
     }
 }
