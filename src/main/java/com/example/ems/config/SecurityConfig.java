@@ -18,6 +18,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.ems.security.JwtAuthFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -36,7 +38,11 @@ public class SecurityConfig {
             .csrf(c -> c.disable())
 
            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
+.exceptionHandling(e -> e.authenticationEntryPoint(
+    (request, response, authException) -> {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+))
             .sessionManagement(s ->
                 s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
@@ -66,11 +72,16 @@ public class SecurityConfig {
 
         CorsConfiguration cors = new CorsConfiguration();
 
-        cors.setAllowedOrigins(List.of(
-            "http://localhost:4200",
-            "https://employee-management-system-frontend-virid-one.vercel.app",
-            "https://employee-management-system-frontend-wheat.vercel.app"
-        ));
+        // cors.setAllowedOrigins(List.of(
+        //     "http://localhost:4200",
+        //     "https://employee-management-system-frontend-virid-one.vercel.app",
+        //     "https://employee-management-system-frontend-wheat.vercel.app"
+        // ));
+        cors.setAllowedOriginPatterns(List.of(
+    "http://localhost:4200",
+    "http://127.0.0.1:4200",
+    "https://*.vercel.app"
+));
 
         cors.setAllowedMethods(List.of(
             "GET",
