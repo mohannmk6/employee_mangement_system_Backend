@@ -75,6 +75,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public Map<String, String> forgot(@RequestBody Map<String, String> body) {
+           System.out.println("========== FORGOT PASSWORD API CALLED ==========");
         String email = Optional.ofNullable(body.get("email")).orElse("").trim();
         if (email.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
