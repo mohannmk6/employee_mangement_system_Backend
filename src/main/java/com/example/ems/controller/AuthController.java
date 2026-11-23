@@ -75,7 +75,7 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public Map<String, String> forgot(@RequestBody Map<String, String> body) {
-           System.out.println("========== FORGOT PASSWORD API CALLED ==========");
+        System.out.println("========== FORGOT PASSWORD API CALLED ==========");
         String email = Optional.ofNullable(body.get("email")).orElse("").trim();
         if (email.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
@@ -101,8 +101,9 @@ public class AuthController {
                 helper.setTo(deliveryEmail);
                 if (sender != null && !sender.isBlank()) {
                     helper.setFrom(sender);
-                
-                }helper.setSubject("EMS - Password Reset OTP");
+
+                }
+                helper.setSubject("EMS - Password Reset OTP");
                 helper.setText("<div style='font-family:Arial,sans-serif;padding:24px;background:#f4f5fb'><div style='max-width:520px;margin:auto;background:#fff;padding:28px;border-radius:16px'><h2 style='color:#31258a'>Employee Management System</h2><p>Your password reset verification code is:</p><div style='font-size:32px;font-weight:bold;letter-spacing:8px;color:#31258a;padding:18px;background:#f0efff;text-align:center;border-radius:10px'>" + otp + "</div><p>This code expires in 5 minutes. If you did not request this, ignore this email.</p></div></div>", true);
                 mail.send(message);
             } catch (Exception ex) {
@@ -120,13 +121,15 @@ public class AuthController {
         UserAccount account = resolveAccount(email);
         if (account == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired OTP");
-        
-        }String key = account.getUsername().toLowerCase(Locale.ROOT);
+
+        }
+        String key = account.getUsername().toLowerCase(Locale.ROOT);
         OtpEntry entry = otps.get(key);
         if (entry == null || Instant.now().isAfter(entry.expires()) || !entry.code().equals(code)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired OTP");
-        
-        }String token = UUID.randomUUID().toString();
+
+        }
+        String token = UUID.randomUUID().toString();
         resetTokens.put(token, new ResetEntry(key, Instant.now().plusSeconds(600)));
         otps.remove(key);
         return Map.of("message", "OTP verified", "resetToken", token);
@@ -139,13 +142,15 @@ public class AuthController {
         String password = Optional.ofNullable(body.get("newPassword")).orElse("");
         if (password.length() < 8 || password.length() > 72) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be 8 to 72 characters");
-        
-        }ResetEntry entry = resetTokens.get(token);
+
+        }
+        ResetEntry entry = resetTokens.get(token);
         UserAccount account = resolveAccount(email);
         if (entry == null || Instant.now().isAfter(entry.expires()) || account == null || !entry.username().equals(account.getUsername().toLowerCase(Locale.ROOT))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired reset token");
-        
-        }account.setPassword(encoder.encode(password));
+
+        }
+        account.setPassword(encoder.encode(password));
         users.save(account);
         resetTokens.remove(token);
         return Map.of("message", "Password reset successfully");
@@ -155,16 +160,18 @@ public class AuthController {
         UserAccount u = users.findByUsernameIgnoreCase(email).orElse(null);
         if (u != null) {
             return u;
-        
-        }Employee e = employees.findByEmailIgnoreCase(email).orElse(null);
+
+        }
+        Employee e = employees.findByEmailIgnoreCase(email).orElse(null);
         return e == null ? null : users.findByEmployeeId(e.getId()).orElse(null);
     }
 
     private String normalizeRole(String role) {
         if (role == null || role.isBlank()) {
             return "ROLE_EMPLOYEE";
-        
-        }String r = role.toUpperCase(Locale.ROOT);
+
+        }
+        String r = role.toUpperCase(Locale.ROOT);
         return r.startsWith("ROLE_") ? r : "ROLE_" + r;
     }
 }

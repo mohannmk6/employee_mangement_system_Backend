@@ -72,11 +72,11 @@ public class SecurityConfig {
 
         CorsConfiguration cors = new CorsConfiguration();
 
-        // cors.setAllowedOrigins(List.of(
-        //     "http://localhost:4200",
-        //     "https://employee-management-system-frontend-virid-one.vercel.app",
-        //     "https://employee-management-system-frontend-wheat.vercel.app"
-        // ));
+        cors.setAllowedOrigins(List.of(
+            "http://localhost:4200",
+            "https://employee-management-system-frontend-virid-one.vercel.app",
+            "https://employee-management-system-frontend-wheat.vercel.app"
+        ));
         cors.setAllowedOriginPatterns(List.of(
     "http://localhost:4200",
     "http://127.0.0.1:4200",
