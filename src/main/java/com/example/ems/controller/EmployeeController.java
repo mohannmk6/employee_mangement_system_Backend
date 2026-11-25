@@ -66,6 +66,7 @@ public class EmployeeController {
         e.setWebsite(input.getWebsite());
         e.setBio(input.getBio());
         String initial = input.getPassword();
+    
         if (initial == null || initial.isBlank()) {
             initial = "Welcome@123";
         
